@@ -255,7 +255,7 @@ extension EmojiPopoverViewController {
     private func changeDarkModeStyle() {
         popoverPresentationController?.backgroundColor = isDarkMode ? darkModeBackgroundColor : backgroundColor
         bottomVisualEffectView?.effect = UIBlurEffect(style: isDarkMode ? .dark : .light)
-        groupTopLineView?.backgroundColor = UIColor(hexString: isDarkMode ? "#3d3d3d" : "#9d9d9d")?.withAlphaComponent(0.3)
+        groupTopLineView?.backgroundColor = UIColor(hex: isDarkMode ? 0x3d3d3d : 0x9d9d9d, alpha: 0.3)
     }
     
     private func selectCurrentGroupCell() {
