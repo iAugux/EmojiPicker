@@ -11,7 +11,8 @@ let package = Package(
     products: [
         .library(
             name: "EmojiPicker",
-            targets: ["EmojiPicker"]),
+            targets: ["EmojiPicker"]
+        ),
     ],
     targets: [
         .target(

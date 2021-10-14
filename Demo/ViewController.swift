@@ -1,8 +1,8 @@
 // Created by Augus on 2021/10/14
 // Copyright © 2021 Augus <iAugux@gmail.com>
 
-import UIKit
 import EmojiPicker
+import UIKit
 
 class ViewController: UIViewController {
     override func viewDidLoad() {
@@ -32,4 +32,3 @@ class ViewController: UIViewController {
         present(emojiPicker, animated: true, completion: nil)
     }
 }
-
