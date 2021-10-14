@@ -8,7 +8,7 @@
 
 import UIKit
 
-public protocol EmojiPickerViewControllerDelegate: class {
+public protocol EmojiPickerViewControllerDelegate: AnyObject {
     func emojiPickerViewController(_ controller: EmojiPickerViewController, didSelect emoji: String)
 }
 
@@ -25,8 +25,8 @@ open class EmojiPickerViewController: UIViewController {
     open weak var delegate: EmojiPickerViewControllerDelegate?
     lazy var emojiPreviewer: EmojiPreviewable = EmojiPreviewer.shared
     var emojiPopoverVC: EmojiPopoverViewController!
-    
-    open override func viewWillAppear(_ animated: Bool) {
+
+    override open func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         let storyboard = UIStoryboard(name: "EmojiPopover", bundle: Bundle(for: EmojiPopoverViewController.self))
         emojiPopoverVC = storyboard.instantiateInitialViewController() as? EmojiPopoverViewController
@@ -46,19 +46,19 @@ open class EmojiPickerViewController: UIViewController {
     }
 }
 
-// MARK: - EmojiPickerContentViewControllerDelegate
+// MARK: - EmojiPickerViewController Conformance to EmojiPopoverViewControllerDelegate
 
 extension EmojiPickerViewController: EmojiPopoverViewControllerDelegate {
     func emojiPickerViewController(_ controller: EmojiPopoverViewController, didSelect emoji: Emoji) {
         emojiPreviewer.hide()
         delegate?.emojiPickerViewController(self, didSelect: emoji.selectedEmoji ?? emoji.emojis.first!)
     }
-    
+
     func emojiPickerViewController(_ controller: EmojiPopoverViewController, brief emoji: Emoji, sourceView: UIView) {
         let sourceRect = sourceView.convert(sourceView.bounds, to: view)
         emojiPreviewer.brief(sourceView: view.window!, sourceRect: sourceRect, emoji: emoji, emojiFontSize: emojiFontSize, isDarkMode: isDarkMode)
     }
-    
+
     func emojiPickerViewController(_ controller: EmojiPopoverViewController, preview emoji: Emoji, sourceView: UIView) {
         let sourceRect = sourceView.convert(sourceView.bounds, to: view)
         emojiPreviewer.preview(sourceView: view.window!, sourceRect: sourceRect, emoji: emoji, emojiFontSize: emojiFontSize, isDarkMode: isDarkMode) { [weak self] selectedEmoji in
@@ -72,8 +72,8 @@ extension EmojiPickerViewController: EmojiPopoverViewControllerDelegate {
 
     func emojiPickerViewControllerHideDeselectEmoji(_ controller: EmojiPopoverViewController) {
         emojiPreviewer.hide()
-    }       
-    
+    }
+
     func emojiPickerViewControllerDidDimiss(_ controller: EmojiPopoverViewController) {
         emojiPreviewer.hide()
         dismiss(animated: true, completion: nil)

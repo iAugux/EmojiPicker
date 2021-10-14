@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol EmojiCollectionViewCellDelegate: class {
+protocol EmojiCollectionViewCellDelegate: AnyObject {
     func emojiCollectionViewCell(_ cell: EmojiCollectionViewCell, brief emoji: Emoji)
     func emojiCollectionViewCell(_ cell: EmojiCollectionViewCell, select emoji: Emoji)
     func emojiCollectionViewCell(_ cell: EmojiCollectionViewCell, deselect emoji: Emoji)
@@ -16,7 +16,7 @@ protocol EmojiCollectionViewCellDelegate: class {
 }
 
 final class EmojiCollectionViewCell: UICollectionViewCell {
-    @IBOutlet weak var emojiButton: UIButton!
+    @IBOutlet var emojiButton: UIButton!
     weak var delegate: EmojiCollectionViewCellDelegate?
     lazy var vibrator: Vibratable = Vibrator()
     var emoji: Emoji! {
@@ -25,12 +25,13 @@ final class EmojiCollectionViewCell: UICollectionViewCell {
             emojiButton.setTitle(title, for: .normal, animated: false)
         }
     }
+
     var emojiFontSize: CGFloat = 29 {
         didSet {
             emojiButton.titleLabel?.font = UIFont.systemFont(ofSize: emojiFontSize)
         }
     }
-    
+
     override func awakeFromNib() {
         super.awakeFromNib()
         setupViews()
@@ -43,15 +44,15 @@ extension EmojiCollectionViewCell {
     @IBAction func emojiButtonTouchDown(_ button: UIButton) {
         delegate?.emojiCollectionViewCell(self, brief: emoji)
     }
-    
+
     @IBAction func emojiButtonTouchUpInside(_ button: UIButton) {
         delegate?.emojiCollectionViewCell(self, select: emoji)
     }
-    
+
     @IBAction func emojiButtonTouchUpOutside(_ button: UIButton) {
         delegate?.emojiCollectionViewCell(self, deselect: emoji)
     }
-    
+
     @objc private func longPress(_ longPressGestureRecognizer: UILongPressGestureRecognizer) {
         if emoji.emojis.count == 1 {
             if longPressGestureRecognizer.state == .ended {
@@ -64,7 +65,6 @@ extension EmojiCollectionViewCell {
             }
         }
     }
-
 }
 
 // MARK: - Privates
@@ -77,7 +77,7 @@ extension EmojiCollectionViewCell {
 }
 
 extension Constant {
-    struct EmojiCollectionViewCell {
+    enum EmojiCollectionViewCell {
         static let identifier = "EmojiCollectionViewCell"
         static let size = CGSize(width: 37, height: 37)
     }

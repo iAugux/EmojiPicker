@@ -8,7 +8,7 @@
 
 import UIKit
 
-protocol EmojiPopoverViewControllerDelegate: class {
+protocol EmojiPopoverViewControllerDelegate: AnyObject {
     func emojiPickerViewControllerDidDimiss(_ controller: EmojiPopoverViewController)
     func emojiPickerViewController(_ controller: EmojiPopoverViewController, brief emoji: Emoji, sourceView: UIView)
     func emojiPickerViewController(_ controller: EmojiPopoverViewController, preview emoji: Emoji, sourceView: UIView)
@@ -22,68 +22,76 @@ final class EmojiPopoverViewController: UIViewController {
             popoverPresentationController?.sourceRect = sourceRect
         }
     }
+
     var sourceView: UIView? {
         didSet {
             popoverPresentationController?.sourceView = sourceView
         }
     }
+
     var permittedArrowDirections: UIPopoverArrowDirection = .any {
         didSet {
             popoverPresentationController?.permittedArrowDirections = permittedArrowDirections
         }
     }
+
     var emojiFontSize: CGFloat = 29 {
         didSet {
             emojisCollectionView?.reloadData()
         }
     }
+
     var backgroundColor: UIColor? = UIColor.white.withAlphaComponent(0.5) {
         didSet {
             changeDarkModeStyle()
         }
     }
+
     var darkModeBackgroundColor: UIColor? = UIColor.black.withAlphaComponent(0.5) {
         didSet {
             changeDarkModeStyle()
         }
     }
+
     var isDarkMode = false {
         didSet {
             changeDarkModeStyle()
         }
     }
+
     var language: String? {
         didSet {
             UserDefaults.standard.set(language, forKey: Constant.CurrentLanguage.currentLanguageKey)
         }
     }
+
     var dismissAfterSelected = false
     weak var delegate: EmojiPopoverViewControllerDelegate?
-    
-    @IBOutlet weak var emojisCollectionView: UICollectionView!
-    @IBOutlet weak var groupsCollectionView: UICollectionView!
-    @IBOutlet weak var bottomVisualEffectView: UIVisualEffectView!
-    @IBOutlet weak var groupTopLineView: UIView!
+
+    @IBOutlet var emojisCollectionView: UICollectionView!
+    @IBOutlet var groupsCollectionView: UICollectionView!
+    @IBOutlet var bottomVisualEffectView: UIVisualEffectView!
+    @IBOutlet var groupTopLineView: UIView!
     var selectedGroupCell: GroupCollectionViewCell?
     lazy var viewModel: EmojiPickerViewModelProtocol = EmojiPickerViewModel(userDefaults: UserDefaults.standard)
     lazy var vibrator: Vibratable = Vibrator()
-    
+
     override func awakeFromNib() {
         super.awakeFromNib()
         modalPresentationStyle = .popover
         popoverPresentationController?.permittedArrowDirections = permittedArrowDirections
         popoverPresentationController?.delegate = self
     }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         setupViews()
     }
-    
+
     func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
         return .none
     }
-    
+
     func select(emoji: Emoji) {
         viewModel.select(emoji: emoji)
         emojisCollectionView.reloadSections(IndexSet(integer: EmojiGroup.frequentlyUsed.index))
@@ -92,7 +100,7 @@ final class EmojiPopoverViewController: UIViewController {
     }
 }
 
-// MARK: - UICollectionViewDataSource
+// MARK: - EmojiPopoverViewController Conformance to UIPopoverPresentationControllerDelegate
 
 extension EmojiPopoverViewController: UIPopoverPresentationControllerDelegate {
     func popoverPresentationControllerDidDismissPopover(_ popoverPresentationController: UIPopoverPresentationController) {
@@ -100,7 +108,7 @@ extension EmojiPopoverViewController: UIPopoverPresentationControllerDelegate {
     }
 }
 
-// MARK: - UICollectionViewDataSource
+// MARK: - EmojiPopoverViewController Conformance to UICollectionViewDataSource
 
 extension EmojiPopoverViewController: UICollectionViewDataSource {
     func numberOfSections(in collectionView: UICollectionView) -> Int {
@@ -109,14 +117,14 @@ extension EmojiPopoverViewController: UICollectionViewDataSource {
         }
         return 1
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         if collectionView == emojisCollectionView {
             return viewModel.numberOfEmojis(section: section)
         }
         return viewModel.numberOfSections
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         if collectionView == emojisCollectionView {
             let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constant.EmojiCollectionViewCell.identifier, for: indexPath) as! EmojiCollectionViewCell
@@ -127,7 +135,7 @@ extension EmojiPopoverViewController: UICollectionViewDataSource {
             }
             return cell
         }
-        
+
         let cell = collectionView.dequeueReusableCell(withReuseIdentifier: Constant.GroupCollectionViewCell.identifier, for: indexPath) as! GroupCollectionViewCell
         cell.indexPath = indexPath
         cell.delegate = self
@@ -143,7 +151,7 @@ extension EmojiPopoverViewController: UICollectionViewDataSource {
     }
 }
 
-// MARK: - UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
+// MARK: - EmojiPopoverViewController Conformance to UICollectionViewDelegate, UICollectionViewDelegateFlowLayout
 
 extension EmojiPopoverViewController: UICollectionViewDelegate, UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
@@ -152,7 +160,7 @@ extension EmojiPopoverViewController: UICollectionViewDelegate, UICollectionView
         }
         return CGSize(width: max(collectionView.frame.width/CGFloat(viewModel.numberOfSections), 32), height: collectionView.frame.height)
     }
-    
+
     func collectionView(_ collectionView: UICollectionView, viewForSupplementaryElementOfKind kind: String, at indexPath: IndexPath) -> UICollectionReusableView {
         if collectionView == emojisCollectionView {
             let headerView = collectionView.dequeueReusableSupplementaryView(ofKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Constant.EmojiHeaderView.identifier, for: indexPath) as! EmojiHeaderView
@@ -172,23 +180,23 @@ extension EmojiPopoverViewController {
     func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
         selectCurrentGroupCell()
     }
-    
+
     func scrollViewDidEndDecelerating(_ scrollView: UIScrollView) {
         selectCurrentGroupCell()
     }
-    
+
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         delegate?.emojiPickerViewControllerHideDeselectEmoji(self)
     }
 }
 
-// MARK: - GroupCollectionViewCellDelegate
+// MARK: - EmojiPopoverViewController Conformance to EmojiCollectionViewCellDelegate
 
 extension EmojiPopoverViewController: EmojiCollectionViewCellDelegate {
     func emojiCollectionViewCell(_ cell: EmojiCollectionViewCell, brief emoji: Emoji) {
         delegate?.emojiPickerViewController(self, brief: emoji, sourceView: cell)
     }
-    
+
     func emojiCollectionViewCell(_ cell: EmojiCollectionViewCell, select emoji: Emoji) {
         delegate?.emojiPickerViewController(self, didSelect: emoji)
         viewModel.select(emoji: emoji)
@@ -201,17 +209,17 @@ extension EmojiPopoverViewController: EmojiCollectionViewCellDelegate {
             emojisCollectionView.reloadSections(IndexSet(integer: EmojiGroup.frequentlyUsed.index))
         }
     }
-    
+
     func emojiCollectionViewCell(_ cell: EmojiCollectionViewCell, deselect emoji: Emoji) {
         delegate?.emojiPickerViewControllerHideDeselectEmoji(self)
     }
-    
+
     func emojiCollectionViewCell(_ cell: EmojiCollectionViewCell, preview emoji: Emoji) {
         delegate?.emojiPickerViewController(self, preview: emoji, sourceView: cell)
     }
 }
 
-// MARK: - GroupCollectionViewCellDelegate
+// MARK: - EmojiPopoverViewController Conformance to GroupCollectionViewCellDelegate
 
 extension EmojiPopoverViewController: GroupCollectionViewCellDelegate {
     func groupCollectionViewCell(_ cell: GroupCollectionViewCell, didSelect indexPath: IndexPath) {
@@ -234,30 +242,30 @@ extension EmojiPopoverViewController {
         emojisCollectionView.dataSource = self
         groupsCollectionView.delegate = self
         groupsCollectionView.dataSource = self
-        
+
         var nib = UINib(nibName: Constant.EmojiCollectionViewCell.identifier, bundle: Bundle(for: EmojiCollectionViewCell.self))
         emojisCollectionView.register(nib, forCellWithReuseIdentifier: Constant.EmojiCollectionViewCell.identifier)
         nib = UINib(nibName: Constant.EmojiHeaderView.identifier, bundle: Bundle(for: EmojiHeaderView.self))
         emojisCollectionView.register(nib, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Constant.EmojiHeaderView.identifier)
         var layout = emojisCollectionView.collectionViewLayout as? UICollectionViewFlowLayout
         layout?.headerReferenceSize = CGSize(width: emojisCollectionView.frame.width, height: Constant.EmojiHeaderView.height)
-        
+
         nib = UINib(nibName: Constant.GroupCollectionViewCell.identifier, bundle: Bundle(for: GroupCollectionViewCell.self))
         groupsCollectionView.register(nib, forCellWithReuseIdentifier: Constant.GroupCollectionViewCell.identifier)
         nib = UINib(nibName: Constant.GroupHeaderView.identifier, bundle: Bundle(for: GroupHeaderView.self))
         groupsCollectionView.register(nib, forSupplementaryViewOfKind: UICollectionView.elementKindSectionHeader, withReuseIdentifier: Constant.GroupHeaderView.identifier)
         layout = groupsCollectionView.collectionViewLayout as? UICollectionViewFlowLayout
         layout?.headerReferenceSize = CGSize(width: 0, height: 0)
-        
+
         changeDarkModeStyle()
     }
-    
+
     private func changeDarkModeStyle() {
         popoverPresentationController?.backgroundColor = isDarkMode ? darkModeBackgroundColor : backgroundColor
         bottomVisualEffectView?.effect = UIBlurEffect(style: isDarkMode ? .dark : .light)
-        groupTopLineView?.backgroundColor = UIColor(hex: isDarkMode ? 0x3d3d3d : 0x9d9d9d, alpha: 0.3)
+        groupTopLineView?.backgroundColor = UIColor(hex: isDarkMode ? 0x3D3D3D : 0x9D9D9D, alpha: 0.3)
     }
-    
+
     private func selectCurrentGroupCell() {
         guard let emojiCell = emojisCollectionView.visibleCells.first,
             let indexPath = emojisCollectionView.indexPath(for: emojiCell),

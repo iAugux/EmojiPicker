@@ -9,8 +9,8 @@
 import UIKit
 
 final class EmojiHeaderView: UICollectionReusableView {
-    @IBOutlet weak var titleLabel: UILabel!
-    
+    @IBOutlet var titleLabel: UILabel!
+
     var title: String? {
         didSet {
             titleLabel.text = title
@@ -19,7 +19,7 @@ final class EmojiHeaderView: UICollectionReusableView {
 }
 
 extension Constant {
-    struct EmojiHeaderView {
+    enum EmojiHeaderView {
         static let identifier = "EmojiHeaderView"
         static let height: CGFloat = 32
     }

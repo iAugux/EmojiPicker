@@ -13,7 +13,7 @@ protocol Vibratable {
 
 struct Vibrator {}
 
-// MARK: - Vibrating
+// MARK: - Vibrator Conformance to Vibratable
 
 extension Vibrator: Vibratable {
     func vibrate() {

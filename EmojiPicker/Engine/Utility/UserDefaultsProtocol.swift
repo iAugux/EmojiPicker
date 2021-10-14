@@ -14,6 +14,6 @@ protocol UserDefaultsProtocol {
     func dictionary(forKey defaultName: String) -> [String : Any]?
 }
 
-// MARK: - UserDefaultsProtocol
+// MARK: - UserDefaults Conformance to UserDefaultsProtocol
 
 extension UserDefaults: UserDefaultsProtocol {}

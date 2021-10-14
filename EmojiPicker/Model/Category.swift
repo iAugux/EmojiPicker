@@ -18,7 +18,7 @@ enum EmojiGroup: String, Codable {
     case objects
     case symbols
     case flags
-    
+
     init?(index: Int) {
         switch index {
         case 0:
@@ -43,7 +43,7 @@ enum EmojiGroup: String, Codable {
             return nil
         }
     }
-    
+
     var index: Int {
         switch self {
         case .frequentlyUsed:
@@ -66,7 +66,7 @@ enum EmojiGroup: String, Codable {
             return 8
         }
     }
-    
+
     var name: String {
         switch self {
         case .frequentlyUsed:
@@ -94,12 +94,12 @@ enum EmojiGroup: String, Codable {
 struct Category: Codable {
     var emojis: [Emoji]!
     var type: EmojiGroup!
-    
+
     enum CodingKeys: String, CodingKey {
         case emojis
         case type
     }
-    
+
     init(from decoder: Decoder) throws {
         let values = try decoder.container(keyedBy: CodingKeys.self)
         emojis = try values.decode([[String]].self, forKey: .emojis).map { Emoji(emojis: $0) }

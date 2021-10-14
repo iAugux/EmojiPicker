@@ -19,7 +19,7 @@ protocol EmojiPickerViewModelProtocol {
 final class EmojiPickerViewModel {
     var emojis: [Int: [Emoji]] = [:]
     let userDefaults: UserDefaultsProtocol
-    
+
     init(userDefaults: UserDefaultsProtocol) {
         self.userDefaults = userDefaults
         if let data = userDefaults.data(forKey: Constant.EmojiPickerViewModel.frequentlyUsed) {
@@ -39,7 +39,7 @@ final class EmojiPickerViewModel {
         }
         let data = try! Data(contentsOf: URL(fileURLWithPath: path), options: .alwaysMapped)
         let categories = try! JSONDecoder().decode([Category].self, from: data)
-        
+
         let selectedEmojis = userDefaults.dictionary(forKey: Constant.EmojiPickerViewModel.selectedEmojis) as? [String: String]
         for var category in categories {
             if let selectedEmojis = selectedEmojis {
@@ -52,27 +52,27 @@ final class EmojiPickerViewModel {
     }
 }
 
-// MARK: - EmojiPickerViewModelProtocol
+// MARK: - EmojiPickerViewModel Conformance to EmojiPickerViewModelProtocol
 
 extension EmojiPickerViewModel: EmojiPickerViewModelProtocol {
     var numberOfSections: Int {
         return emojis.count
     }
-    
+
     func numberOfEmojis(section: Int) -> Int {
         guard let type = EmojiGroup(index: section) else { return 0 }
         return emojis[type.index]?.count ?? 0
     }
-    
+
     func emoji(at indexPath: IndexPath) -> Emoji? {
         guard let type = EmojiGroup(index: indexPath.section) else { return nil }
         return emojis[type.index]?[indexPath.item]
     }
-    
+
     func select(emoji: Emoji) {
         updateFrequentlyUsed(emoji: emoji)
         updateSelectedEmoji(emoji)
-        
+
         for item in emojis {
             guard item.key != EmojiGroup.frequentlyUsed.index,
                 let index = item.value.firstIndex(where: { $0.emojis == emoji.emojis }) else { continue }
@@ -80,7 +80,7 @@ extension EmojiPickerViewModel: EmojiPickerViewModelProtocol {
             break
         }
     }
-    
+
     func indexPath(of emoji: Emoji) -> IndexPath? {
         for item in emojis {
             guard item.key != EmojiGroup.frequentlyUsed.index,
@@ -108,7 +108,7 @@ extension EmojiPickerViewModel {
         let data = try! JSONEncoder().encode(frequentlyUsedEmojis)
         userDefaults.set(data, forKey: Constant.EmojiPickerViewModel.frequentlyUsed)
     }
-    
+
     private func updateSelectedEmoji(_ emoji: Emoji) {
         guard emoji.selectedEmoji != emoji.emojis.first else { return }
         var selectedEmojis = userDefaults.dictionary(forKey: Constant.EmojiPickerViewModel.selectedEmojis) as? [String: String] ?? [:]
@@ -117,8 +117,8 @@ extension EmojiPickerViewModel {
     }
 }
 
-struct Constant {
-    struct EmojiPickerViewModel {
+enum Constant {
+    enum EmojiPickerViewModel {
         static let frequentlyUsed = "com.levantAJ.EmojiPicker.frequentlyUsed"
         static let selectedEmojis = "com.levantAJ.EmojiPicker.selectedEmojis"
     }

@@ -11,7 +11,7 @@ import Foundation
 struct Emoji: Codable {
     var emojis: [String]!
     var selectedEmoji: String?
-    
+
     init(emojis: [String], selectedEmoji: String? = nil) {
         self.emojis = emojis
         self.selectedEmoji = selectedEmoji

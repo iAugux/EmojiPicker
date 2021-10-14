@@ -8,16 +8,16 @@
 
 import UIKit
 
-protocol GroupCollectionViewCellDelegate: class {
+protocol GroupCollectionViewCellDelegate: AnyObject {
     func groupCollectionViewCell(_ cell: GroupCollectionViewCell, didSelect indexPath: IndexPath)
 }
 
 final class GroupCollectionViewCell: UICollectionViewCell {
-    @IBOutlet weak var groupButton: UIButton!
+    @IBOutlet var groupButton: UIButton!
     var indexPath: IndexPath!
     weak var delegate: GroupCollectionViewCellDelegate?
     lazy var vibrator: Vibratable = Vibrator()
-    
+
     var image: UIImage? {
         didSet {
             groupButton.tintColor = .darkGray
@@ -25,24 +25,24 @@ final class GroupCollectionViewCell: UICollectionViewCell {
             groupButton.setImage(image, for: .normal)
         }
     }
-    
+
     var isDarkMode = false {
         didSet {
             changeDarkModeStyle()
         }
     }
-    
+
     override var isSelected: Bool {
         didSet {
             changeDarkModeStyle()
         }
     }
-    
+
     override func layoutSubviews() {
         super.layoutSubviews()
         groupButton.layer.cornerRadius = groupButton.frame.width/2
     }
-    
+
     override func prepareForReuse() {
         super.prepareForReuse()
         groupButton.backgroundColor = .clear
@@ -68,7 +68,7 @@ extension GroupCollectionViewCell {
 }
 
 extension Constant {
-    struct GroupCollectionViewCell {
+    enum GroupCollectionViewCell {
         static let identifier = "GroupCollectionViewCell"
     }
 }

@@ -24,8 +24,8 @@ extension String {
 }
 
 extension Constant {
-    struct CurrentLanguage {
-        static var language: String? = nil
+    enum CurrentLanguage {
+        static var language: String?
         static var bundle = Bundle(for: EmojiPicker.self)
         static let currentLanguageKey = "com.levantAJ.EmojiPicker.currentLanguage"
     }

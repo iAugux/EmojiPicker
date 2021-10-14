@@ -11,7 +11,7 @@ import UIKit
 final class GroupHeaderView: UICollectionReusableView {}
 
 extension Constant {
-    struct GroupHeaderView {
+    enum GroupHeaderView {
         static let identifier = "GroupHeaderView"
     }
 }
